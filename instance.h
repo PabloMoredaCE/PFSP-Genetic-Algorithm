@@ -17,6 +17,10 @@ class Instance {
    */
   int makespan(const std::vector<int>& permutation) const;  
 
+  int getJobs() const {
+    return jobs_;
+  }
+
   private:
     int jobs_;
     int machines_;

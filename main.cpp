@@ -1,4 +1,5 @@
 #include "instance.h"
+#include "random_search.h"
 
 #include <iostream>
 #include <fstream>
@@ -42,3 +43,18 @@ int main(int argc, char* argv[]) {
   }
 
 Instance instance(jobs, machines, processing_times);
+
+RandomSearch rands;
+rands.run(instance, 2);
+  std::cout << "Makespan 2: " << rands.getBestMakespan();
+  std::cout << '\n';
+  for (int job : rands.getBestPermutation()) {std::cout << job << ' ';}
+  std::cout << '\n';
+
+rands.run(instance, 10000);
+  std::cout << "Makespan 10000: " << rands.getBestMakespan();
+  std::cout << '\n';
+  for (int job : rands.getBestPermutation()) {std::cout << job << ' ';}
+  std::cout << '\n';
+
+}
