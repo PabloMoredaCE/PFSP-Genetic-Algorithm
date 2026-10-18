@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
   int jobs;
   int machines;
   
-  intput >> jobs >> machines;
+  input >> jobs >> machines;
   std::vector<std::vector<int>> processing_times(machines, std::vector<int>(jobs));
 
   for(int machine = 0; machine < machines; machine++) {
@@ -40,3 +40,5 @@ int main(int argc, char* argv[]) {
       input >> processing_times[machine][job];
     }
   }
+
+Instance instance(jobs, machines, processing_times);
