@@ -14,12 +14,23 @@ class GeneticAlgorithm {
     
     void run(const Instance& instance, int evaluations);
 
+    const std::vector<int>& getBestPermutation() const {
+      return best_permutation_;
+    }
+
+    int getBestMakespan() const {
+      return best_makespan_;
+    }
+
 
   private:
     int population_size_;
     int tournament_size_;
     double pc_;
     double pm_;
+
+    std::vector<int> best_permutation_;
+    int best_makespan_;
 
     std::mt19937 generator_;
 

@@ -71,4 +71,14 @@ neh.run(instance);
 GeneticAlgorithm gen(50, 0.8, 0.1, 3, seed);
 gen.run(instance, 50000);
 
+std::cout << "Genetic Algorithm Makespan: "
+          << gen.getBestMakespan()
+          << '\n';
+
+for (int job : gen.getBestPermutation()) {
+  std::cout << job << ' ';
+}
+
+std::cout << '\n';
+
 }

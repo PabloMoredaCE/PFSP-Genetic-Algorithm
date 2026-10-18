@@ -11,6 +11,8 @@ GeneticAlgorithm::GeneticAlgorithm(int population_size, double pc, double pm,
 void GeneticAlgorithm::run(const Instance& instance, int evaluations) {
   population_.clear();
 
+  int evaluation_count = 0;
+
   for(int i = 0; i < population_size_; ++i) {
     std::vector<int> individual(instance.getJobs());
 
@@ -22,41 +24,87 @@ void GeneticAlgorithm::run(const Instance& instance, int evaluations) {
   }
 
   std::uniform_real_distribution<double> probability(0.0, 1.0);
-
-  int parent1_index = tournamentSelection();
-  int parent2_index = tournamentSelection();
-
-  const std::vector<int>& parent1 = population_[parent1_index].first;
-  const std::vector<int>& parent2 = population_[parent2_index].first;
-
-  std::vector<int> child1;
-  std::vector<int> child2;
-
-  if(probability(generator_) < pc_) {
-    child1 = orderCrossover(parent1, parent2);
-    child2 = orderCrossover(parent2, parent1);
-  } else {
-    child1 = parent1;
-    child2 = parent2;
-  }
-
   std::uniform_int_distribution<int> mutation_type(0, 1);
 
-  if (probability(generator_) < pm_) {
-    if (mutation_type(generator_) == 0) {
-     swapMutation(child1);
-    } else {
-      insertionMutation(child1);
+  while(evaluation_count < evaluations) {
+    std::vector<std::pair<std::vector<int>, int>> new_population;
+
+    int elite_index = 0;
+    for(int i = 1; i < static_cast<int>(population_.size()); ++i) {
+      if(population_[i].second < population_[elite_index].second) {
+        elite_index = i;
+      }
+    }
+      
+    new_population.push_back(population_[elite_index]);
+
+    
+
+    while((new_population.size() < static_cast<std::size_t>(population_size_)) && (evaluation_count < evaluations)) {
+
+      int parent1_index = tournamentSelection();
+      int parent2_index = tournamentSelection();
+
+      const std::vector<int>& parent1 = population_[parent1_index].first;
+      const std::vector<int>& parent2 = population_[parent2_index].first;
+
+      std::vector<int> child1;
+      std::vector<int> child2;
+
+      //Crossover
+      if(probability(generator_) < pc_) {
+        child1 = orderCrossover(parent1, parent2);
+        child2 = orderCrossover(parent2, parent1);
+      } else {
+        child1 = parent1;
+        child2 = parent2;
+      }
+
+      //Mutation 1
+      if (probability(generator_) < pm_) {
+        if (mutation_type(generator_) == 0) {
+        swapMutation(child1);
+        } else {
+          insertionMutation(child1);
+        }
+      }
+
+      //Mutation 2
+      if (probability(generator_) < pm_) {
+        if (mutation_type(generator_) == 0) {
+          swapMutation(child2);
+        } else {
+          insertionMutation(child2);
+        }
+      }
+
+      //Evaluation 1
+      int make1 = instance.makespan(child1);
+      ++evaluation_count;
+      new_population.push_back({child1, make1});
+
+
+      //Evaluation 2 (if there is space)
+      if((new_population.size() < static_cast<std::size_t>(population_size_)) && (evaluation_count < evaluations)) {
+        int make2 = instance.makespan(child2);
+        ++evaluation_count;
+        new_population.push_back({child2, make2});
+      } 
+    }
+
+    population_ = new_population;
+  }
+
+  int best_index = 0;
+
+  for (int i = 1; i < static_cast<int>(population_.size()); ++i) {
+    if (population_[i].second < population_[best_index].second) {
+      best_index = i;
     }
   }
 
-  if (probability(generator_) < pm_) {
-    if (mutation_type(generator_) == 0) {
-      swapMutation(child2);
-    } else {
-      insertionMutation(child2);
-    }
-  }
+  best_permutation_ = population_[best_index].first;
+  best_makespan_ = population_[best_index].second;
 }
 
 
