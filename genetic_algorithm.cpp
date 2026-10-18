@@ -1,6 +1,7 @@
 #include "genetic_algorithm.h"
 #include <algorithm>
 #include <iostream>
+#include <stdexcept>
 
 GeneticAlgorithm::GeneticAlgorithm(int population_size, double pc, double pm, 
       int tournament_size, unsigned int seed) :
@@ -18,6 +19,10 @@ void GeneticAlgorithm::run(const Instance& instance, int evaluations) {
 
     std::iota(individual.begin(), individual.end(), 1);
     std::shuffle(individual.begin(), individual.end(), generator_);
+
+    if(!isValidPermutation(individual, instance.getJobs())) {
+      throw std::runtime_error("Invalid permutation in initial population");
+    }
 
     int make = instance.makespan(individual);
     population_.push_back({individual, make});
@@ -76,6 +81,13 @@ void GeneticAlgorithm::run(const Instance& instance, int evaluations) {
         } else {
           insertionMutation(child2);
         }
+      }
+
+      if(!isValidPermutation(child1, instance.getJobs())) {
+        throw std::runtime_error("Invalid permutation for child1");
+      }
+      if(!isValidPermutation(child2, instance.getJobs())) {
+        throw std::runtime_error("Invalid permutation for child2");
       }
 
       //Evaluation 1
@@ -186,4 +198,21 @@ void GeneticAlgorithm::insertionMutation(std::vector<int>& individual) {
   int job = individual[from];
   individual.erase(individual.begin() + from);
   individual.insert(individual.begin() + to, job);
+}
+
+bool GeneticAlgorithm::isValidPermutation(const std::vector<int>& permutation, int jobs) const {
+  if(jobs != static_cast<int>(permutation.size())) {
+    return false;
+  }
+
+  for(int i = 1; i <= jobs; ++i) {
+    int count = 0;
+    for(int j = 0; j < jobs; ++j) {
+      if(permutation[j] == i) { ++count; };
+    }
+    if(count != 1) {
+      return false;
+    }
+  }
+  return true;
 }

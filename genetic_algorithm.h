@@ -42,5 +42,7 @@ class GeneticAlgorithm {
 
     void swapMutation(std::vector<int>& individual);
     void insertionMutation(std::vector<int>& individual);
+
+    bool isValidPermutation(const std::vector<int>& permutation, int jobs) const;
 };
 #endif
