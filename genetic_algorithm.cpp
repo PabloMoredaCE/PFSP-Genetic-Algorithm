@@ -21,28 +21,42 @@ void GeneticAlgorithm::run(const Instance& instance, int evaluations) {
     population_.push_back({individual, make});
   }
 
-  const std::vector<int>& parent1 = population_[0].first;
-const std::vector<int>& parent2 = population_[1].first;
+  std::uniform_real_distribution<double> probability(0.0, 1.0);
 
-std::vector<int> child = orderCrossover(parent1, parent2);
+  int parent1_index = tournamentSelection();
+  int parent2_index = tournamentSelection();
 
-std::cout << "Parent 1: ";
-for (int job : parent1) {
-  std::cout << job << ' ';
-}
+  const std::vector<int>& parent1 = population_[parent1_index].first;
+  const std::vector<int>& parent2 = population_[parent2_index].first;
 
-std::cout << "\nParent 2: ";
-for (int job : parent2) {
-  std::cout << job << ' ';
-}
+  std::vector<int> child1;
+  std::vector<int> child2;
 
-std::cout << "\nChild: ";
-for (int job : child) {
-  std::cout << job << ' ';
-}
+  if(probability(generator_) < pc_) {
+    child1 = orderCrossover(parent1, parent2);
+    child2 = orderCrossover(parent2, parent1);
+  } else {
+    child1 = parent1;
+    child2 = parent2;
+  }
 
-std::cout << '\n';
+  std::uniform_int_distribution<int> mutation_type(0, 1);
 
+  if (probability(generator_) < pm_) {
+    if (mutation_type(generator_) == 0) {
+     swapMutation(child1);
+    } else {
+      insertionMutation(child1);
+    }
+  }
+
+  if (probability(generator_) < pm_) {
+    if (mutation_type(generator_) == 0) {
+      swapMutation(child2);
+    } else {
+      insertionMutation(child2);
+    }
+  }
 }
 
 
@@ -61,6 +75,7 @@ int GeneticAlgorithm::tournamentSelection() {
 
   return best_index;
 }
+
 
 std::vector<int> GeneticAlgorithm::orderCrossover(const std::vector<int>& parent1, const std::vector<int>& parent2) {
   int size = static_cast<int>(parent1.size());
@@ -91,4 +106,36 @@ std::vector<int> GeneticAlgorithm::orderCrossover(const std::vector<int>& parent
   }
   return child;
   
+}
+
+
+void GeneticAlgorithm::swapMutation(std::vector<int>& individual) {
+  if(individual.size() < 2) { return; }
+  std::uniform_int_distribution<int> distribution(0, static_cast<int>(individual.size()) - 1);
+
+  int pos1 = distribution(generator_);
+  int pos2 = distribution(generator_);
+
+  while(pos1 == pos2) {
+    pos2 = distribution(generator_);
+  }
+  
+  std::swap(individual[pos1], individual[pos2]);
+}
+
+
+void GeneticAlgorithm::insertionMutation(std::vector<int>& individual) {
+  if(individual.size() < 2) { return; }
+  std::uniform_int_distribution<int> distribution(0, static_cast<int>(individual.size()) - 1);
+
+  int from = distribution(generator_);
+  int to = distribution(generator_);
+
+  while(from == to) {
+    to = distribution(generator_);
+  }
+  
+  int job = individual[from];
+  individual.erase(individual.begin() + from);
+  individual.insert(individual.begin() + to, job);
 }

@@ -28,5 +28,8 @@ class GeneticAlgorithm {
     int tournamentSelection();
 
     std::vector<int> orderCrossover(const std::vector<int>& parent1, const std::vector<int>& parent2);
+
+    void swapMutation(std::vector<int>& individual);
+    void insertionMutation(std::vector<int>& individual);
 };
 #endif
