@@ -2,10 +2,13 @@
 #define RANDOM_SEARCH_H_
 
 #include <vector>
+#include <random>
 #include "instance.h"
 
 class RandomSearch {
   public:
+
+  explicit RandomSearch(unsigned int seed) : generator_(seed) {}
 
   void run(const Instance& instance, int evaluations);
 
@@ -22,6 +25,7 @@ class RandomSearch {
   private:
     std::vector<int> best_permutation_;
     int best_makespan_;
+    std::mt19937 generator_;
 };
 
 

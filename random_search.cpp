@@ -1,16 +1,13 @@
 #include "random_search.h"
 #include <algorithm>
 #include <numeric>
-#include <random>
 
 
   std::vector<int>RandomSearch::random_permutation(int jobs) {
-    std::random_device rd;
-    std::mt19937 engine(rd());
     std::vector<int> permutation(jobs);
     
     std::iota(permutation.begin(), permutation.end(), 1);
-    std::shuffle(permutation.begin(), permutation.end(), engine);
+    std::shuffle(permutation.begin(), permutation.end(), generator_);
 
     return permutation;
 

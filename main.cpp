@@ -17,14 +17,16 @@
 
 int main(int argc, char* argv[]) {
 
-  if(argc != 2) {
+  if(argc != 3) {
     std::cerr << "Usage: "
               << argv[0]
-              << " <input_file>\n"; 
+              << " <input_file> <seed>\n"; 
     return 1;
   }
 
   std::ifstream input{argv[1]};
+
+  unsigned int seed = static_cast<unsigned int>(std::stoul(argv[2]));
 
   if (!input) {
     std::cerr << "Couldn't open file\n";
@@ -45,7 +47,7 @@ int main(int argc, char* argv[]) {
 
 Instance instance(jobs, machines, processing_times);
 
-RandomSearch rands;
+RandomSearch rands(seed);
 rands.run(instance, 2);
   std::cout << "Random Makespan 2: " << rands.getBestMakespan();
   std::cout << '\n';
