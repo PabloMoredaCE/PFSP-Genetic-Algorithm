@@ -1,5 +1,6 @@
 #include "instance.h"
 #include "random_search.h"
+#include "neh.h"
 
 #include <iostream>
 #include <fstream>
@@ -46,15 +47,22 @@ Instance instance(jobs, machines, processing_times);
 
 RandomSearch rands;
 rands.run(instance, 2);
-  std::cout << "Makespan 2: " << rands.getBestMakespan();
+  std::cout << "Random Makespan 2: " << rands.getBestMakespan();
   std::cout << '\n';
   for (int job : rands.getBestPermutation()) {std::cout << job << ' ';}
   std::cout << '\n';
 
 rands.run(instance, 10000);
-  std::cout << "Makespan 10000: " << rands.getBestMakespan();
+  std::cout << "Random Makespan 10000: " << rands.getBestMakespan();
   std::cout << '\n';
   for (int job : rands.getBestPermutation()) {std::cout << job << ' ';}
+  std::cout << '\n';
+
+NEH neh;
+neh.run(instance);
+  std::cout << "NEH Makespan: " << neh.getBestMakespan();
+  std::cout << '\n';
+  for (int job : neh.getBestPermutation()) {std::cout << job << ' ';}
   std::cout << '\n';
 
 }

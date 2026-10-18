@@ -21,6 +21,14 @@ class Instance {
     return jobs_;
   }
 
+  int getMachines() const {
+    return machines_;
+  }
+
+  int getProcessingTime(int machine, int job) const {
+    return processing_times_[machine][job];
+  }
+
   private:
     int jobs_;
     int machines_;
