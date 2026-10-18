@@ -18,21 +18,48 @@
 
 int main(int argc, char* argv[]) {
 
-  if(argc != 3) {
+  if(argc != 3 && argc != 7) {
     std::cerr << "Usage: "
-              << argv[0]
-              << " <input_file> <seed>\n"; 
+              << "  " << argv[0] << "<input_file> <seed>\n"
+              << "  " << argv[0] 
+              << " <input_file> <seed> <population> <pc> <pm> <tournament>\n"; 
     return 1;
   }
 
   std::ifstream input{argv[1]};
 
-  unsigned int seed = static_cast<unsigned int>(std::stoul(argv[2]));
-
   if (!input) {
     std::cerr << "Couldn't open file\n";
     return 1;
   }
+
+  unsigned int seed = static_cast<unsigned int>(std::stoul(argv[2]));
+  int population_size = 50;
+  double pc = 0.8;
+  double pm = 0.1;
+  int tournament_size = 3;
+
+  if(argc == 7) {
+    population_size = std::stoi(argv[3]);
+    pc = std::stod(argv[4]);
+    pm = std::stod(argv[5]);
+    tournament_size = std::stoi(argv[6]);
+  }
+
+  if(population_size <= 0) {
+    std::cerr << "Population size must be positive\n";
+    return 1;
+  }
+
+  if(pc < 0.0 || pc > 1.0 || pm < 0.0 || pm > 1.0) {
+    std::cerr << "pc and pm must be between 0 and 1\n";
+    return 1;
+  }
+
+  if(tournament_size <= 0 || tournament_size > population_size) {
+    std::cerr << "Invalid tournament size\n";
+    return 1;
+  } 
 
   int jobs;
   int machines;
@@ -68,7 +95,7 @@ neh.run(instance);
   for (int job : neh.getBestPermutation()) {std::cout << job << ' ';}
   std::cout << '\n';
 
-GeneticAlgorithm gen(50, 0.8, 0.1, 3, seed);
+GeneticAlgorithm gen(population_size, pc, pm, tournament_size, seed);
 gen.run(instance, 50000);
 
 std::cout << "Genetic Algorithm Makespan: "
@@ -80,5 +107,7 @@ for (int job : gen.getBestPermutation()) {
 }
 
 std::cout << '\n';
+
+return 0;
 
 }
