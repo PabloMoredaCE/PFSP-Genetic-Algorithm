@@ -6,12 +6,12 @@
 
 
 void NEH::run(const Instance& instance) {
-  int jobs = static_cast<int>(instance.getJobs());
+  int jobs = instance.getJobs();
   std::vector<int> total(jobs, 0);
   std::vector<std::pair<int, int>> job_times(jobs);
 
   for(int i = 0; i < jobs; ++i) {
-    for(int j = 0; j < static_cast<int>(instance.getMachines()); ++j) {
+    for(int j = 0; j < instance.getMachines(); ++j) {
       total[i] += instance.getProcessingTime(j, i);
     }
     job_times[i].first = i + 1;
@@ -36,7 +36,7 @@ void NEH::run(const Instance& instance) {
     best_makespan_ = second_make;
     best_permutation_ = second_order;
   }
-  
+
   for(int k = 2; k < jobs; ++k) {
     int job = job_times[k].first;
 

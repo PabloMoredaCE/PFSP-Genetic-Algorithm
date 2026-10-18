@@ -1,6 +1,7 @@
 #include "instance.h"
 #include "random_search.h"
 #include "neh.h"
+#include "genetic_algorithm.h"
 
 #include <iostream>
 #include <fstream>
@@ -66,5 +67,8 @@ neh.run(instance);
   std::cout << '\n';
   for (int job : neh.getBestPermutation()) {std::cout << job << ' ';}
   std::cout << '\n';
+
+GeneticAlgorithm gen(50, 0.8, 0.1, 3, seed);
+gen.run(instance, 50000);
 
 }
