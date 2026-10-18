@@ -26,5 +26,7 @@ class GeneticAlgorithm {
     std::vector<std::pair<std::vector<int>, int>> population_;
 
     int tournamentSelection();
+
+    std::vector<int> orderCrossover(const std::vector<int>& parent1, const std::vector<int>& parent2);
 };
 #endif
