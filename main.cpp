@@ -2,6 +2,7 @@
 #include "random_search.h"
 #include "neh.h"
 #include "genetic_algorithm.h"
+#include "metrics.h"
 
 #include <iostream>
 #include <fstream>
