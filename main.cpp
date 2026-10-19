@@ -134,6 +134,10 @@ std::cout << "UB: " << instance.getUpperBound() << '\n';
 
 std::cout << '\n';
 
+std::cout << "RESULT " << seed << ' ' << population_size << ' ' << pc << ' ' << pm << ' '
+          << tournament_size << ' ' << gen.getBestMakespan() << ' ' << calculateRPD(gen.getBestMakespan(), instance.getUpperBound())
+          << '\n';
+
 return 0;
 
 }
