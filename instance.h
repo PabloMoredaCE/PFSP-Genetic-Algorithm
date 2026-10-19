@@ -6,9 +6,10 @@
 class Instance {
   public:
 
-    Instance(int jobs, int machines, const std::vector<std::vector<int>>& processing_times) :
-      jobs_(jobs), machines_(machines), processing_times_(processing_times) {
-    }
+    Instance(int jobs, int machines, 
+      const std::vector<std::vector<int>>& processing_times, int upper_bound = -1) :
+        jobs_(jobs), machines_(machines), processing_times_(processing_times), 
+        upper_bound_(upper_bound) {}
 
   /**
    * @brief Returns the makespan of a given permutación
@@ -29,10 +30,15 @@ class Instance {
     return processing_times_[machine][job];
   }
 
+  int getUpperBound() const {
+    return upper_bound_;
+  }
+
   private:
     int jobs_;
     int machines_;
     std::vector<std::vector<int>> processing_times_;
+    int upper_bound_;
 
 };
 

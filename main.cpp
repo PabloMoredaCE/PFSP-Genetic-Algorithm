@@ -63,8 +63,29 @@ int main(int argc, char* argv[]) {
 
   int jobs;
   int machines;
-  
-  input >> jobs >> machines;
+  int upper_bound = -1;
+
+  std::string first_line; 
+  std::getline(input, first_line);
+  std::istringstream first_stream(first_line);
+  if(first_stream >> jobs >> machines) {
+    upper_bound = -1;
+  } else {
+    std::string data_line;
+    std::getline(input, data_line);
+    std::istringstream data_stream(data_line);
+
+    int initial_seed;
+    int lower_bound;
+
+    data_stream >> jobs >> machines >> initial_seed
+                >> upper_bound >> lower_bound;
+    
+    //Skip header line
+    std::string processing_header;
+    std::getline(input, processing_header);
+  }
+
   std::vector<std::vector<int>> processing_times(machines, std::vector<int>(jobs));
 
   for(int machine = 0; machine < machines; machine++) {
@@ -73,7 +94,7 @@ int main(int argc, char* argv[]) {
     }
   }
 
-Instance instance(jobs, machines, processing_times);
+Instance instance(jobs, machines, processing_times, upper_bound);
 
 RandomSearch rands(seed);
 rands.run(instance, 2);
@@ -105,6 +126,10 @@ std::cout << "Genetic Algorithm Makespan: "
 for (int job : gen.getBestPermutation()) {
   std::cout << job << ' ';
 }
+
+std::cout << "Jobs: " << instance.getJobs() << '\n';
+std::cout << "Machines: " << instance.getMachines() << '\n';
+std::cout << "UB: " << instance.getUpperBound() << '\n';
 
 std::cout << '\n';
 
