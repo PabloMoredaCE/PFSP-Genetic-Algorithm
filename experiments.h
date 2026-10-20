@@ -3,6 +3,8 @@
 
 #include "instance.h"
 
+#include <string>
+
 void runExperiments(const Instance& instance, const std::string& instance_name);
 
 #endif

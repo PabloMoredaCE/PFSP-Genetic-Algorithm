@@ -3,6 +3,7 @@
 #include "neh.h"
 #include "genetic_algorithm.h"
 #include "metrics.h"
+#include "experiments.h"
 
 #include <iostream>
 #include <fstream>
@@ -97,46 +98,7 @@ int main(int argc, char* argv[]) {
 
 Instance instance(jobs, machines, processing_times, upper_bound);
 
-RandomSearch rands(seed);
-rands.run(instance, 2);
-  std::cout << "Random Makespan 2: " << rands.getBestMakespan();
-  std::cout << '\n';
-  for (int job : rands.getBestPermutation()) {std::cout << job << ' ';}
-  std::cout << '\n';
-
-rands.run(instance, 10000);
-  std::cout << "Random Makespan 10000: " << rands.getBestMakespan();
-  std::cout << '\n';
-  for (int job : rands.getBestPermutation()) {std::cout << job << ' ';}
-  std::cout << '\n';
-
-NEH neh;
-neh.run(instance);
-  std::cout << "NEH Makespan: " << neh.getBestMakespan();
-  std::cout << '\n';
-  for (int job : neh.getBestPermutation()) {std::cout << job << ' ';}
-  std::cout << '\n';
-
-GeneticAlgorithm gen(population_size, pc, pm, tournament_size, seed);
-gen.run(instance, 50000);
-
-std::cout << "Genetic Algorithm Makespan: "
-          << gen.getBestMakespan()
-          << '\n';
-
-for (int job : gen.getBestPermutation()) {
-  std::cout << job << ' ';
-}
-
-std::cout << "Jobs: " << instance.getJobs() << '\n';
-std::cout << "Machines: " << instance.getMachines() << '\n';
-std::cout << "UB: " << instance.getUpperBound() << '\n';
-
-std::cout << '\n';
-
-std::cout << "RESULT " << seed << ' ' << population_size << ' ' << pc << ' ' << pm << ' '
-          << tournament_size << ' ' << gen.getBestMakespan() << ' ' << calculateRPD(gen.getBestMakespan(), instance.getUpperBound())
-          << '\n';
+runExperiments(instance, argv[1]);
 
 return 0;
 

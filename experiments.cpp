@@ -10,17 +10,17 @@
 #include <numeric>
 
 void runExperiments(const Instance& instance, const std::string& instance_name) {
-  bool file_exists = std::ifstream("results.csv").good();
-  std::ofstream output("results.csv", std::ios::app);
+  bool file_exists = std::ifstream("raw_results.csv").good();
+  std::ofstream output("raw_results.csv", std::ios::app);
 
   if(!output) {
-    std::cerr << "Could not create file results.csv\n";
+    std::cerr << "Could not create file raw_results.csv\n";
     return;
   }
 
   if(!file_exists) {
-    output << "Distance, n, m, Best Cmax, Standard deviation, NEH Cmax, "
-           << "Promedio T CPU, RPD(UB), RPD(NEH)\n";
+    output << "Instance,n,m,Algorithm,Run,Seed, "
+           << "Cmax,CPU,RPD(UB)\n";
   }
 
   //Parameter definition
@@ -30,8 +30,6 @@ void runExperiments(const Instance& instance, const std::string& instance_name) 
   double pm = 0.1;
   int tournament_size = 3;
 
-  std::vector<int> cmax_values;
-  std::vector<double> cpu_times;
 
   for (int run = 0; run < 10; ++run) {
     unsigned int seed = base_seed + run;
@@ -44,25 +42,12 @@ void runExperiments(const Instance& instance, const std::string& instance_name) 
 
     double seconds = std::chrono::duration<double>(end - start).count();
 
-    cmax_values.push_back(ga.getBestMakespan());
-    cpu_times.push_back(seconds);
+    int cmax = ga.getBestMakespan();
+
+    double rpd_ub = calculateRPD(cmax, instance.getUpperBound());
+
+     output << instance_name << instance.getJobs() << ',' << instance.getMachines() << ','
+         << "GA" << ',' << run + 1 << ',' << seed << ','
+         << cmax << ',' << seconds << ',' << rpd_ub << '\n';
   }
-
-  int best_cmax = *std::min_element(cmax_values.begin(), cmax_values.end());
-
-  double average_cpu = std::accumulate(cpu_times.begin(), cpu_times.end(), 0.0) / cpu_times.size();
-
-  double standard_deviation = calculateStandardDeviation(cmax_values);
-
-  NEH neh;
-  neh.run(instance);
-  int neh_cmax = neh.getBestMakespan();
-
-  double rpd_ub = calculateRPD(best_cmax, instance.getUpperBound());
-  double rpd_neh = calculateRPD(best_cmax, neh_cmax);
-
-
-  output << instance.getJobs() << ',' << instance.getMachines() << ','
-         << best_cmax << ',' << standard_deviation << ',' << neh_cmax << ','
-         << average_cpu << ',' << rpd_ub << ',' << rpd_neh << '\n';
 }
