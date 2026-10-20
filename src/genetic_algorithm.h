@@ -25,14 +25,14 @@ class GeneticAlgorithm {
 
   private:
     int population_size_;
-    int tournament_size_;
     double pc_;
     double pm_;
+    int tournament_size_;
+    std::mt19937 generator_;
 
     std::vector<int> best_permutation_;
     int best_makespan_;
 
-    std::mt19937 generator_;
 
     std::vector<std::pair<std::vector<int>, int>> population_;
 

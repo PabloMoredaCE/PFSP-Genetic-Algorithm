@@ -11,7 +11,7 @@
 #include <algorithm>
 #include <numeric>
 
-void runExperiments(const Instance& instance, const std::string& instance_name) {
+void runExperiments(const Instance& instance, const std::string& instance_name, int population_size, double pc, double pm, int tournament_size) {
   bool file_exists = std::ifstream("raw_results.csv").good();
   std::ofstream output("raw_results.csv", std::ios::app);
 
@@ -22,15 +22,12 @@ void runExperiments(const Instance& instance, const std::string& instance_name) 
 
   if(!file_exists) {
     output << "Instance,n,m,Algorithm,Run,Seed,"
+           << "Population,pc,pm,Tournament,"
            << "Cmax,CPU,RPD(UB)\n";
   }
 
   //Parameter definition
   unsigned int base_seed = 42;
-  int population_size = 50;
-  double pc = 0.8;
-  double pm = 0.1;
-  int tournament_size = 3;
 
 
   for (int run = 0; run < 10; ++run) {
@@ -50,6 +47,7 @@ void runExperiments(const Instance& instance, const std::string& instance_name) 
 
      output << instance_name << ',' << instance.getJobs() << ',' << instance.getMachines() << ','
          << "GA" << ',' << run + 1 << ',' << seed << ','
+         << population_size << ',' << pc << ',' << pm << ',' << tournament_size << ','
          << cmax << ',' << seconds << ',' << rpd_ub << '\n';
   }
 }

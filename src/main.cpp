@@ -29,21 +29,7 @@ int main(int argc, char* argv[]) {
     return 0;
   }
 
-   if (argc == 3 && std::string(argv[1]) == "-e") {
-    try {
-      std::string filename = argv[2];
-      
-      Instance instance = loadInstance(filename);
-      runExperiments(instance, filename);
-    } catch (const std::exception& error) {
-      std::cerr << error.what() << '\n';
-      return 1;
-    }
-
-    return 0;
-  }
-
-    if(argc == 4 && std::string(argv[1]) == "-g") {
+  if(argc == 4 && std::string(argv[1]) == "-g") {
     int jobs = std::stoi(argv[2]);
     int machines = std::stoi(argv[3]);
 
@@ -53,6 +39,30 @@ int main(int argc, char* argv[]) {
       std::cerr << error.what() << '\n';
       return 1;
     }
+    return 0;
+  }
+
+  if ((argc == 3 || argc == 7) && std::string(argv[1]) == "-e") {
+    try {
+      std::string filename = argv[2];
+
+      Instance instance = loadInstance(filename);
+
+      if (argc == 3) {
+        runExperiments(instance, filename);
+      } else {
+        int population_size = std::stoi(argv[3]);
+        double pc = std::stod(argv[4]);
+        double pm = std::stod(argv[5]);
+        int tournament_size = std::stoi(argv[6]);
+
+        runExperiments(instance, filename, population_size, pc, pm, tournament_size);
+      }
+    } catch (const std::exception& error) {
+      std::cerr << error.what() << '\n';
+      return 1;
+    }
+
     return 0;
   }
 
