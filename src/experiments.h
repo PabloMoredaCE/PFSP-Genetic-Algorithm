@@ -10,6 +10,6 @@ void runExperiments(const Instance& instance, const std::string& instance_name,
 
 void resetRawResults();
 
-void runExperimentGroup(int jobs, int machines);
+void runExperimentGroup(int jobs, int machines, int skip_index = -1);
 
 #endif

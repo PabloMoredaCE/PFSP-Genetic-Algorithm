@@ -29,12 +29,17 @@ int main(int argc, char* argv[]) {
     return 0;
   }
 
-  if(argc == 4 && std::string(argv[1]) == "-g") {
+  if((argc == 4 || argc == 5) && std::string(argv[1]) == "-g") {
     int jobs = std::stoi(argv[2]);
     int machines = std::stoi(argv[3]);
 
+    int skip_index = -1;
+    if(argc == 5) {
+      skip_index = std::stoi(argv[4]);
+    }
+
     try {
-      runExperimentGroup(jobs, machines);
+      runExperimentGroup(jobs, machines, skip_index);
     } catch (const std::exception& error) {
       std::cerr << error.what() << '\n';
       return 1;

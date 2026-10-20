@@ -3,6 +3,7 @@
 #include "metrics.h"
 #include "neh.h"
 #include "instance_reader.h"
+#include "random_search.h"
 
 #include <fstream>
 #include <iostream>
@@ -50,6 +51,39 @@ void runExperiments(const Instance& instance, const std::string& instance_name, 
          << population_size << ',' << pc << ',' << pm << ',' << tournament_size << ','
          << cmax << ',' << seconds << ',' << rpd_ub << '\n';
   }
+
+  for (int run = 0; run < 10; ++run) {
+    unsigned int seed = base_seed + run;
+    RandomSearch random_search(seed);
+    
+    auto start = std::chrono::high_resolution_clock::now();
+    random_search.run(instance, 50000);
+    auto end = std::chrono::high_resolution_clock::now();
+    double seconds = std::chrono::duration<double>(end - start).count();
+
+    int cmax = random_search.getBestMakespan();
+    double rpd_ub =calculateRPD(cmax,instance.getUpperBound());
+
+    output << instance_name << ',' << instance.getJobs() << ',' << instance.getMachines() << ','
+           << "RandomSearch" << ',' << run + 1 << ',' << seed << ','
+           << "-,-,-,-," << cmax << ',' << seconds << ',' << rpd_ub << '\n';
+  }
+ 
+  NEH neh;
+  auto start = std::chrono::high_resolution_clock::now();
+  
+  neh.run(instance);
+  
+  auto end = std::chrono::high_resolution_clock::now();
+  double seconds = std::chrono::duration<double>(end - start).count();
+
+  int cmax = neh.getBestMakespan();
+
+  double rpd_ub = calculateRPD(cmax, instance.getUpperBound());
+
+  output << instance_name << ',' << instance.getJobs() << ',' << instance.getMachines() << ','
+         << "NEH" << ',' << 1 << ',' << "-" << ',' 
+         << "-,-,-,-," << cmax << ',' << seconds << ',' << rpd_ub << '\n';
 }
 
 void resetRawResults() {
@@ -60,8 +94,11 @@ void resetRawResults() {
   }
 }
 
-void runExperimentGroup(int jobs, int machines) {
+void runExperimentGroup(int jobs, int machines, int skip_index) {
   for (int i = 0; i < 10; ++i) {
+    if(i == skip_index) {
+      continue;
+    }
     std::string filename =
         "instances/tai" +
         std::to_string(jobs) + "_" +
