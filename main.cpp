@@ -1,15 +1,13 @@
 #include "instance.h"
-#include "random_search.h"
+#include "instance_reader.h"
+//#include "random_search.h"
 #include "neh.h"
 #include "genetic_algorithm.h"
 #include "metrics.h"
 #include "experiments.h"
 
 #include <iostream>
-#include <fstream>
-#include <sstream>
 #include <string>
-#include <utility>
 #include <vector>
 
 /**
@@ -17,6 +15,12 @@
  * @brief Inicio del programa
  * 
  */
+void printPermutation(const std::vector<int>& permutation) {
+  for(int job : permutation) {
+    std::cout << job << ' ';
+  }
+  std::cout << '\n';
+}
 
 int main(int argc, char* argv[]) {
 
@@ -24,87 +28,88 @@ int main(int argc, char* argv[]) {
     resetRawResults();
     return 0;
   }
-  
-  if(argc != 3 && argc != 7) {
-    std::cerr << "Usage: "
-              << "  " << argv[0] << "<input_file> <seed>\n"
-              << "  " << argv[0] 
-              << " <input_file> <seed> <population> <pc> <pm> <tournament>\n"; 
+
+   if (argc == 3 && std::string(argv[1]) == "-e") {
+    try {
+      std::string filename = argv[2];
+      
+      Instance instance = loadInstance(filename);
+      runExperiments(instance, filename);
+    } catch (const std::exception& error) {
+      std::cerr << error.what() << '\n';
+      return 1;
+    }
+
+    return 0;
+  }
+
+  if (argc != 3 && argc != 7) {
+
+    std::cerr << "Usage:\n" << "  " << argv[0]
+              << " <input_file> <seed>\n"
+              << "  " << argv[0] << " <input_file> <seed>"
+              << " <population> <pc> <pm> <tournament>\n"
+              << "  " << argv[0] << " -e <input_file>\n"
+              << "  " << argv[0] << " -r\n";
     return 1;
   }
 
-  std::ifstream input{argv[1]};
 
-  if (!input) {
-    std::cerr << "Couldn't open file\n";
-    return 1;
-  }
+  std::string filename = argv[1];
 
   unsigned int seed = static_cast<unsigned int>(std::stoul(argv[2]));
+
+  // Default parameters
   int population_size = 50;
   double pc = 0.8;
   double pm = 0.1;
   int tournament_size = 3;
 
-  if(argc == 7) {
+  // Custom parameters
+  if (argc == 7) {
     population_size = std::stoi(argv[3]);
     pc = std::stod(argv[4]);
     pm = std::stod(argv[5]);
     tournament_size = std::stoi(argv[6]);
   }
 
-  if(population_size <= 0) {
+  // Parameter validation
+  if (population_size <= 0) {
     std::cerr << "Population size must be positive\n";
     return 1;
   }
 
-  if(pc < 0.0 || pc > 1.0 || pm < 0.0 || pm > 1.0) {
+  if (pc < 0.0 || pc > 1.0 || pm < 0.0 || pm > 1.0) {
     std::cerr << "pc and pm must be between 0 and 1\n";
     return 1;
   }
 
-  if(tournament_size <= 0 || tournament_size > population_size) {
+  if (tournament_size <= 0 || tournament_size > population_size) {
     std::cerr << "Invalid tournament size\n";
     return 1;
-  } 
-
-  int jobs;
-  int machines;
-  int upper_bound = -1;
-
-  std::string first_line; 
-  std::getline(input, first_line);
-  std::istringstream first_stream(first_line);
-  if(first_stream >> jobs >> machines) {
-    upper_bound = -1;
-  } else {
-    std::string data_line;
-    std::getline(input, data_line);
-    std::istringstream data_stream(data_line);
-
-    int initial_seed;
-    int lower_bound;
-
-    data_stream >> jobs >> machines >> initial_seed
-                >> upper_bound >> lower_bound;
-    
-    //Skip header line
-    std::string processing_header;
-    std::getline(input, processing_header);
   }
 
-  std::vector<std::vector<int>> processing_times(machines, std::vector<int>(jobs));
 
-  for(int machine = 0; machine < machines; machine++) {
-    for(int job = 0; job < jobs; job++) {
-      input >> processing_times[machine][job];
-    }
+  try {
+    Instance instance = loadInstance(filename);
+    GeneticAlgorithm gen(population_size, pc, pm, tournament_size, seed);
+    gen.run(instance, 50000);
+
+    std::cout << "Genetic Algorithm Makespan: " << gen.getBestMakespan() << '\n';
+    printPermutation(gen.getBestPermutation());
+
+    // Instance information
+    std::cout << "Jobs: " << instance.getJobs() << '\n';
+    std::cout << "Machines: " << instance.getMachines() << '\n';
+    std::cout << "UB: " << instance.getUpperBound() << '\n';
+
+    std::cout << "Result " << seed << ' ' << population_size << ' ' << pc << ' ' << pm << ' '
+              << tournament_size << ' ' << gen.getBestMakespan() << ' ' 
+              << calculateRPD(gen.getBestMakespan(), instance.getUpperBound()) << '\n';
+  } catch (const std::exception& error) {
+    std::cerr << error.what() << '\n';
+    return 1;
   }
 
-Instance instance(jobs, machines, processing_times, upper_bound);
-
-runExperiments(instance, argv[1]);
-
-return 0;
-
+  return 0;
 }
