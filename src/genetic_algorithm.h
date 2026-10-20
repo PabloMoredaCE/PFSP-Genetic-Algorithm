@@ -22,6 +22,10 @@ class GeneticAlgorithm {
       return best_makespan_;
     }
 
+    const std::vector<std::pair<int, int>>& getConvergence() const {
+      return convergence_;
+    }
+
 
   private:
     int population_size_;
@@ -29,6 +33,8 @@ class GeneticAlgorithm {
     double pm_;
     int tournament_size_;
     std::mt19937 generator_;
+    
+    std::vector<std::pair<int, int>> convergence_;
 
     std::vector<int> best_permutation_;
     int best_makespan_;
@@ -44,5 +50,6 @@ class GeneticAlgorithm {
     void insertionMutation(std::vector<int>& individual);
 
     bool isValidPermutation(const std::vector<int>& permutation, int jobs) const;
+
 };
 #endif

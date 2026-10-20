@@ -5,14 +5,19 @@
 
 GeneticAlgorithm::GeneticAlgorithm(int population_size, double pc, double pm, 
       int tournament_size, unsigned int seed) :
-        population_size_(population_size), pc_(pc), pm_(pm), tournament_size_(tournament_size), generator_(seed) {}
+        population_size_(population_size), pc_(pc), pm_(pm), 
+        tournament_size_(tournament_size), generator_(seed), best_makespan_(std::numeric_limits<int>::max()) {}
 
 
 
 void GeneticAlgorithm::run(const Instance& instance, int evaluations) {
   population_.clear();
+  convergence_.clear();
+  best_permutation_.clear();
+  best_makespan_ = std::numeric_limits<int>::max();
 
   int evaluation_count = 0;
+  int best_so_far = std::numeric_limits<int>::max();
 
   for(int i = 0; i < population_size_; ++i) {
     std::vector<int> individual(instance.getJobs());
@@ -27,6 +32,14 @@ void GeneticAlgorithm::run(const Instance& instance, int evaluations) {
     int make = instance.makespan(individual);
     ++evaluation_count;
     population_.push_back({individual, make});
+
+    if(make < best_so_far) {
+      best_so_far = make;
+    }
+
+    if(evaluation_count % 1000 == 0 || evaluation_count == evaluations) {
+      convergence_.push_back({evaluation_count, best_so_far});
+    }
   }
 
   std::uniform_real_distribution<double> probability(0.0, 1.0);
@@ -94,6 +107,14 @@ void GeneticAlgorithm::run(const Instance& instance, int evaluations) {
       int make1 = instance.makespan(child1);
       ++evaluation_count;
       new_population.push_back({child1, make1});
+      
+      if(make1 < best_so_far) {
+        best_so_far = make1;
+      }
+
+      if(evaluation_count % 1000 == 0 || evaluation_count == evaluations) {
+        convergence_.push_back({evaluation_count, best_so_far});
+      }
 
 
       //Evaluation 2 (if there is space)
@@ -101,6 +122,14 @@ void GeneticAlgorithm::run(const Instance& instance, int evaluations) {
         int make2 = instance.makespan(child2);
         ++evaluation_count;
         new_population.push_back({child2, make2});
+
+        if(make2 < best_so_far) {
+        best_so_far = make2;
+        }
+
+      if(evaluation_count % 1000 == 0 || evaluation_count == evaluations) {
+        convergence_.push_back({evaluation_count, best_so_far});
+      }
       } 
     }
 

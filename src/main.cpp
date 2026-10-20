@@ -1,7 +1,5 @@
 #include "instance.h"
 #include "instance_reader.h"
-//#include "random_search.h"
-#include "neh.h"
 #include "genetic_algorithm.h"
 #include "metrics.h"
 #include "experiments.h"
@@ -71,6 +69,35 @@ int main(int argc, char* argv[]) {
     return 0;
   }
 
+  // Convergence experiments
+  if (argc == 3 && std::string(argv[1]) == "-c") {
+    try {
+      std::string filename = argv[2];
+      Instance instance = loadInstance(filename);
+      runConvergenceExperiments(instance, filename);
+
+    } catch (const std::exception& error) {
+      std::cerr << error.what() << '\n';
+      return 1;
+    }
+
+    return 0;
+  }
+
+
+  // Generate T6 result tables
+  if (argc == 3 && std::string(argv[1]) == "-s") {
+    generateResultTables(argv[2]);
+    return 0;
+  }
+
+
+  // Generate convergence summary table
+  if (argc == 3 && std::string(argv[1]) == "-cs") {
+    generateConvergenceSummary(argv[2]);
+    return 0;
+  }
+
   if (argc != 3 && argc != 7) {
 
     std::cerr << "Usage:\n" << "  " << argv[0]
@@ -79,7 +106,10 @@ int main(int argc, char* argv[]) {
               << " <population> <pc> <pm> <tournament>\n"
               << "  " << argv[0] << " -e <input_file>\n"
               << "  " << argv[0] << " -r\n"
-              << "  " << argv[0] << " -g <jobs> <machines>\n";
+              << "  " << argv[0] << " -g <jobs> <machines>\n"
+              << "  " << argv[0] << " -c <input_file>\n"
+              << "  " << argv[0] << " -s <raw_results.csv>\n"
+              << "  " << argv[0] << " -cs <convergence.csv>\n";
     return 1;
   }
 
@@ -88,10 +118,10 @@ int main(int argc, char* argv[]) {
 
   unsigned int seed = static_cast<unsigned int>(std::stoul(argv[2]));
 
-  // Default parameters
+  // Default parameters, changed after T5 evaluations
   int population_size = 50;
   double pc = 0.8;
-  double pm = 0.1;
+  double pm = 0.4;
   int tournament_size = 3;
 
   // Custom parameters

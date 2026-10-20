@@ -8,7 +8,7 @@
 class RandomSearch {
   public:
 
-  explicit RandomSearch(unsigned int seed) : generator_(seed) {}
+  explicit RandomSearch(unsigned int seed);
 
   void run(const Instance& instance, int evaluations);
 
@@ -22,10 +22,16 @@ class RandomSearch {
     return best_makespan_;
   }
 
+  const std::vector<std::pair<int, int>>& getConvergence() const {
+    return convergence_;
+  }
+
   private:
     std::vector<int> best_permutation_;
-    int best_makespan_;
     std::mt19937 generator_;
+    int best_makespan_;
+
+    std::vector<std::pair<int, int>> convergence_;
 };
 
 

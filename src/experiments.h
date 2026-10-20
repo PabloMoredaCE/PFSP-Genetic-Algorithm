@@ -12,4 +12,10 @@ void resetRawResults();
 
 void runExperimentGroup(int jobs, int machines, int skip_index = -1);
 
+void runConvergenceExperiments(const Instance& instance, const std::string& instance_name);
+
+void generateResultTables(const std::string& raw_filename);
+
+void generateConvergenceSummary(const std::string& convergence_filename);
+
 #endif
