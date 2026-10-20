@@ -20,6 +20,11 @@
 
 int main(int argc, char* argv[]) {
 
+  if(argc == 2 && std::string(argv[1]) == "-r") {
+    resetRawResults();
+    return 0;
+  }
+  
   if(argc != 3 && argc != 7) {
     std::cerr << "Usage: "
               << "  " << argv[0] << "<input_file> <seed>\n"

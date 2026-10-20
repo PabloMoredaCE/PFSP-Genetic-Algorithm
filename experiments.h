@@ -7,4 +7,6 @@
 
 void runExperiments(const Instance& instance, const std::string& instance_name);
 
+void resetRawResults();
+
 #endif

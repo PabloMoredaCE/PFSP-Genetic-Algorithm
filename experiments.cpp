@@ -5,6 +5,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <filesystem>
 #include <chrono>
 #include <algorithm>
 #include <numeric>
@@ -19,7 +20,7 @@ void runExperiments(const Instance& instance, const std::string& instance_name) 
   }
 
   if(!file_exists) {
-    output << "Instance,n,m,Algorithm,Run,Seed, "
+    output << "Instance,n,m,Algorithm,Run,Seed,"
            << "Cmax,CPU,RPD(UB)\n";
   }
 
@@ -46,8 +47,16 @@ void runExperiments(const Instance& instance, const std::string& instance_name) 
 
     double rpd_ub = calculateRPD(cmax, instance.getUpperBound());
 
-     output << instance_name << instance.getJobs() << ',' << instance.getMachines() << ','
+     output << instance_name << ',' << instance.getJobs() << ',' << instance.getMachines() << ','
          << "GA" << ',' << run + 1 << ',' << seed << ','
          << cmax << ',' << seconds << ',' << rpd_ub << '\n';
+  }
+}
+
+void resetRawResults() {
+  if(std::filesystem::remove("raw_results.csv")) {
+    std::cout << "raw_results.csv reset sucessfully\n";
+  } else {
+    std::cout << "raw_results.csv does not exist\n";
   }
 }
