@@ -25,6 +25,7 @@ void GeneticAlgorithm::run(const Instance& instance, int evaluations) {
     }
 
     int make = instance.makespan(individual);
+    ++evaluation_count;
     population_.push_back({individual, make});
   }
 
@@ -40,10 +41,9 @@ void GeneticAlgorithm::run(const Instance& instance, int evaluations) {
         elite_index = i;
       }
     }
-      
-    new_population.push_back(population_[elite_index]);
 
-    
+    auto elite = population_[elite_index]; 
+
 
     while((new_population.size() < static_cast<std::size_t>(population_size_)) && (evaluation_count < evaluations)) {
 
@@ -102,6 +102,17 @@ void GeneticAlgorithm::run(const Instance& instance, int evaluations) {
         ++evaluation_count;
         new_population.push_back({child2, make2});
       } 
+    }
+
+    int worst_index = 0;
+    for(int i = 1; i < static_cast<int>(new_population.size()); ++i) {
+      if(new_population[i].second > new_population[worst_index].second) {
+        worst_index = i;
+      }
+    }
+
+    if(elite.second < new_population[worst_index].second) {
+      new_population[worst_index] = elite;
     }
 
     population_ = new_population;
