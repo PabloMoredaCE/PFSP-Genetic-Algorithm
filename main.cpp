@@ -43,6 +43,19 @@ int main(int argc, char* argv[]) {
     return 0;
   }
 
+    if(argc == 4 && std::string(argv[1]) == "-g") {
+    int jobs = std::stoi(argv[2]);
+    int machines = std::stoi(argv[3]);
+
+    try {
+      runExperimentGroup(jobs, machines);
+    } catch (const std::exception& error) {
+      std::cerr << error.what() << '\n';
+      return 1;
+    }
+    return 0;
+  }
+
   if (argc != 3 && argc != 7) {
 
     std::cerr << "Usage:\n" << "  " << argv[0]
@@ -50,7 +63,8 @@ int main(int argc, char* argv[]) {
               << "  " << argv[0] << " <input_file> <seed>"
               << " <population> <pc> <pm> <tournament>\n"
               << "  " << argv[0] << " -e <input_file>\n"
-              << "  " << argv[0] << " -r\n";
+              << "  " << argv[0] << " -r\n"
+              << "  " << argv[0] << " -g <jobs> <machines>\n";
     return 1;
   }
 

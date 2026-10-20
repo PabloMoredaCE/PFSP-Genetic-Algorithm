@@ -2,6 +2,7 @@
 #include "genetic_algorithm.h"
 #include "metrics.h"
 #include "neh.h"
+#include "instance_reader.h"
 
 #include <fstream>
 #include <iostream>
@@ -58,5 +59,24 @@ void resetRawResults() {
     std::cout << "raw_results.csv reset sucessfully\n";
   } else {
     std::cout << "raw_results.csv does not exist\n";
+  }
+}
+
+void runExperimentGroup(int jobs, int machines) {
+  for (int i = 0; i < 10; ++i) {
+    std::string filename =
+        "instances/tai" +
+        std::to_string(jobs) + "_" +
+        std::to_string(machines) + "_" +
+        std::to_string(i) +
+        ".fsp";
+
+    std::cout << "Running: "
+              << filename
+              << '\n';
+
+    Instance instance = loadInstance(filename);
+
+    runExperiments(instance, filename);
   }
 }
