@@ -75,6 +75,6 @@ void runExperimentGroup(int jobs, int machines) {
 
     Instance instance = loadInstance(filename);
 
-    runExperiments(instance, filename);
+    runExperiments(instance, filename, 50, 0.8, 0.4, 3);
   }
 }
