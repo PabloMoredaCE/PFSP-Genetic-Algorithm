@@ -7,9 +7,8 @@
 /**
  * @brief Implements the NEH heuristic for the PFSP.
  *
- * NEH is a deterministic constructive heuristic. It orders the jobs by their
- * total processing time and then builds the final permutation by inserting
- * each job in the position that produces the lowest makespan.
+ * NEH is a deterministic heuristic. It orders the jobs by their total processing time 
+ * and then builds the final permutation by inserting each job in the position that produces the lowest makespan.
  */
 class NEH {
   public:
@@ -17,8 +16,7 @@ class NEH {
   /**
    * @brief Executes the NEH heuristic on a PFSP instance.
    *
-   * The method constructs a job permutation progressively and stores the best
-   * permutation and its corresponding makespan.
+   * The method constructs a job permutation progressively and stores the best permutation and its corresponding makespan.
    *
    * @param instance PFSP instance to solve.
    */

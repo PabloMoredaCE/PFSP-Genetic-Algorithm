@@ -80,7 +80,7 @@ class GeneticAlgorithm {
     /**
     * @brief Selects an individual using tournament selection.
     *
-    * Randomly selects tournament_size_ individuals and returns the index of
+    * Randomly selects (tournament_size_) individuals and returns the index of
     * the one with the lowest makespan.
     *
     * @return Index of the selected individual.
@@ -103,8 +103,7 @@ class GeneticAlgorithm {
     /**
     * @brief Applies swap mutation to an individual.
     *
-    * Two different positions are selected randomly and their jobs are
-    * exchanged.
+    * Two different positions are selected randomly and their jobs are exchanged.
     *
     * @param individual Permutation to mutate.
     */
@@ -113,8 +112,7 @@ class GeneticAlgorithm {
     /**
     * @brief Applies insertion mutation to an individual.
     *
-    * A job is removed from one position and inserted into another randomly
-    * selected position.
+    * A job is removed from one position and inserted into another randomly selected position.
     *
     * @param individual Permutation to mutate.
     */
