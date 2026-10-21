@@ -4,9 +4,10 @@
 #include <stdexcept>
 
 GeneticAlgorithm::GeneticAlgorithm(int population_size, double pc, double pm, 
-      int tournament_size, unsigned int seed) :
+      int tournament_size, unsigned int seed, const std::string& crossover_type) :
         population_size_(population_size), pc_(pc), pm_(pm), 
-        tournament_size_(tournament_size), generator_(seed), best_makespan_(std::numeric_limits<int>::max()) {}
+        tournament_size_(tournament_size), generator_(seed), crossover_type_(crossover_type),
+        best_makespan_(std::numeric_limits<int>::max()) {}
 
 
 
@@ -71,8 +72,25 @@ void GeneticAlgorithm::run(const Instance& instance, int evaluations) {
 
       //Crossover
       if(probability(generator_) < pc_) {
-        child1 = orderCrossover(parent1, parent2);
-        child2 = orderCrossover(parent2, parent1);
+        if(crossover_type_ == "PMX") {
+
+          int size = static_cast<int>(parent1.size());
+
+          std::uniform_int_distribution<int> distribution(0, size - 1);
+          int cut1 = distribution(generator_);
+          int cut2 = distribution(generator_);
+          if(cut1 > cut2) {
+            int temp = cut1;
+            cut1 = cut2;
+            cut2 = temp;
+          }
+
+          child1 = partiallyMappedCrossover(parent1, parent2, cut1, cut2);
+          child2 = partiallyMappedCrossover(parent2, parent1, cut1, cut2);
+        } else {
+          child1 = orderCrossover(parent1, parent2);
+          child2 = orderCrossover(parent2, parent1);
+        }
       } else {
         child1 = parent1;
         child2 = parent2;
@@ -255,4 +273,42 @@ bool GeneticAlgorithm::isValidPermutation(const std::vector<int>& permutation, i
     }
   }
   return true;
+}
+
+std::vector<int> GeneticAlgorithm::partiallyMappedCrossover(const std::vector<int>& parent1, const std::vector<int>& parent2, int cut1, int cut2) {
+  int size = static_cast<int>(parent1.size());
+  std::vector<int> child(size);
+
+ 
+  for(int i = cut1; i <= cut2; ++i) {
+    child[i] = parent1[i];
+  }
+
+
+  //IF Go through the whole child
+  // IF job not on the child already
+  //  value on child[i] = parent2[i]; 
+  // ELSE
+  //  value on child[i] = parent2[index donde está parent2[i]]
+  for(int i = 0; i < size; ++i) {
+    if(i >= cut1 && i <= cut2) { continue; }
+    
+    int job = parent2[i];
+
+    bool conflict = true;
+
+    while(conflict) {
+      conflict = false;
+      for(int i = cut1; i <= cut2; ++i) {
+        if(job == child[i]) {
+          job = parent2[i];
+          conflict = true;
+          break;          
+        }
+      }
+    }
+    child[i] = job;
+  }
+
+  return child;
 }

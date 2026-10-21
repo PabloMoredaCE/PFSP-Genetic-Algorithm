@@ -98,12 +98,12 @@ int main(int argc, char* argv[]) {
     return 0;
   }
 
-  if (argc != 3 && argc != 7) {
+  if (argc != 3 && argc != 8) {
 
     std::cerr << "Usage:\n" << "  " << argv[0]
               << " <input_file> <seed>\n"
               << "  " << argv[0] << " <input_file> <seed>"
-              << " <population> <pc> <pm> <tournament>\n"
+              << " <population> <pc> <pm> <tournament> <crossover_type>\n"
               << "  " << argv[0] << " -e <input_file>\n"
               << "  " << argv[0] << " -r\n"
               << "  " << argv[0] << " -g <jobs> <machines>\n"
@@ -123,13 +123,15 @@ int main(int argc, char* argv[]) {
   double pc = 0.8;
   double pm = 0.4;
   int tournament_size = 3;
+  std::string crossover_type = "OX";
 
   // Custom parameters
-  if (argc == 7) {
+  if (argc == 8) {
     population_size = std::stoi(argv[3]);
     pc = std::stod(argv[4]);
     pm = std::stod(argv[5]);
     tournament_size = std::stoi(argv[6]);
+    crossover_type = argv[7];
   }
 
   // Parameter validation
@@ -148,10 +150,14 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
+  if(crossover_type != "OX" && crossover_type != "PMX") {
+    throw std::invalid_argument("Crossover type must be OX or PMX");
+  }
+
 
   try {
     Instance instance = loadInstance(filename);
-    GeneticAlgorithm gen(population_size, pc, pm, tournament_size, seed);
+    GeneticAlgorithm gen(population_size, pc, pm, tournament_size, seed, crossover_type);
     gen.run(instance, 50000);
 
     std::cout << "Genetic Algorithm Makespan: " << gen.getBestMakespan() << '\n';
