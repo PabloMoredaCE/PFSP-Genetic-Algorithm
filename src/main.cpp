@@ -98,12 +98,12 @@ int main(int argc, char* argv[]) {
     return 0;
   }
 
-  if (argc != 3 && argc != 7) {
+  if (argc != 3 && argc != 8) {
 
     std::cerr << "Usage:\n" << "  " << argv[0]
               << " <input_file> <seed>\n"
               << "  " << argv[0] << " <input_file> <seed>"
-              << " <population> <pc> <pm> <tournament>\n"
+              << " <population> <pc> <pm> <tournament> <pls>\n"
               << "  " << argv[0] << " -e <input_file>\n"
               << "  " << argv[0] << " -r\n"
               << "  " << argv[0] << " -g <jobs> <machines>\n"
@@ -123,13 +123,15 @@ int main(int argc, char* argv[]) {
   double pc = 0.8;
   double pm = 0.4;
   int tournament_size = 3;
+  double pls = 0.1;
 
   // Custom parameters
-  if (argc == 7) {
+  if (argc == 8) {
     population_size = std::stoi(argv[3]);
     pc = std::stod(argv[4]);
     pm = std::stod(argv[5]);
     tournament_size = std::stoi(argv[6]);
+    pls = std::stod(argv[7]);
   }
 
   // Parameter validation
@@ -148,10 +150,14 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
+  if(pls < 0.0 || pls > 1.0) {
+    throw std::invalid_argument("pls must be between 0 and 1");
+  }
+
 
   try {
     Instance instance = loadInstance(filename);
-    GeneticAlgorithm gen(population_size, pc, pm, tournament_size, seed);
+    GeneticAlgorithm gen(population_size, pc, pm, tournament_size, seed, pls);
     gen.run(instance, 50000);
 
     std::cout << "Genetic Algorithm Makespan: " << gen.getBestMakespan() << '\n';

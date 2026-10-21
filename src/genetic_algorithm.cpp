@@ -4,9 +4,9 @@
 #include <stdexcept>
 
 GeneticAlgorithm::GeneticAlgorithm(int population_size, double pc, double pm, 
-      int tournament_size, unsigned int seed) :
+      int tournament_size, unsigned int seed, double pls) :
         population_size_(population_size), pc_(pc), pm_(pm), 
-        tournament_size_(tournament_size), generator_(seed), best_makespan_(std::numeric_limits<int>::max()) {}
+        tournament_size_(tournament_size), generator_(seed), pls_(pls), best_makespan_(std::numeric_limits<int>::max()) {}
 
 
 
@@ -106,8 +106,7 @@ void GeneticAlgorithm::run(const Instance& instance, int evaluations) {
       //Evaluation 1
       int make1 = instance.makespan(child1);
       ++evaluation_count;
-      new_population.push_back({child1, make1});
-      
+
       if(make1 < best_so_far) {
         best_so_far = make1;
       }
@@ -116,12 +115,21 @@ void GeneticAlgorithm::run(const Instance& instance, int evaluations) {
         convergence_.push_back({evaluation_count, best_so_far});
       }
 
+      if(pls_ > 0.0 && evaluation_count < evaluations && probability(generator_) < pls_) {
+        insertionLocalSearch(child1, make1, instance, evaluation_count, evaluations, best_so_far);
+
+        if(!isValidPermutation(child1, instance.getJobs())) {
+          throw std::runtime_error("Invalid permutation after local search for child1");
+        }
+      }
+
+      new_population.push_back({child1, make1});
+
 
       //Evaluation 2 (if there is space)
       if((new_population.size() < static_cast<std::size_t>(population_size_)) && (evaluation_count < evaluations)) {
         int make2 = instance.makespan(child2);
         ++evaluation_count;
-        new_population.push_back({child2, make2});
 
         if(make2 < best_so_far) {
         best_so_far = make2;
@@ -130,6 +138,16 @@ void GeneticAlgorithm::run(const Instance& instance, int evaluations) {
       if(evaluation_count % 1000 == 0 || evaluation_count == evaluations) {
         convergence_.push_back({evaluation_count, best_so_far});
       }
+
+      if(pls_ > 0.0 && evaluation_count < evaluations && probability(generator_) < pls_) {
+        insertionLocalSearch(child2, make2, instance, evaluation_count, evaluations, best_so_far);
+
+        if(!isValidPermutation(child2, instance.getJobs())) {
+          throw std::runtime_error("Invalid permutation after local search for child1");
+        }
+      }
+
+      new_population.push_back({child2, make2});
       } 
     }
 
@@ -255,4 +273,65 @@ bool GeneticAlgorithm::isValidPermutation(const std::vector<int>& permutation, i
     }
   }
   return true;
+}
+
+void GeneticAlgorithm::insertionLocalSearch(std::vector<int>& individual, int& makespan,
+      const Instance& instance, int& evaluation_count, int max_evaluations,
+      int& best_so_far, int forced_postion) {
+        if(individual.size() < 2) { return; }
+
+        int size = static_cast<int>(individual.size());
+        int from;
+
+        if(forced_postion != -1) {
+          if(forced_postion < 0 || forced_postion >= size) {
+            throw std::invalid_argument("Invalid forced position");
+          }
+
+          from = forced_postion;
+        } else {
+          std::uniform_int_distribution<int> distribution(0, size - 1);
+          from = distribution(generator_);
+        }
+
+        int job = individual[from];
+        std::vector<int> partial = individual;
+        partial.erase(partial.begin() + from);
+        
+        std::vector<int> best_individual = individual;
+        int best_make = makespan;
+
+        for(int position = 0; position < size; ++position) {
+          if(position == from) { continue; }
+          if(evaluation_count >= max_evaluations) { break; }
+
+          std::vector<int> candidate = partial;
+          candidate.insert(candidate.begin() + position, job);
+
+          int candidate_make = instance.makespan(candidate);
+
+          ++evaluation_count;
+
+          if(candidate_make < best_so_far) {
+            best_so_far = candidate_make;
+          }
+
+          if(evaluation_count % 1000 == 0 || evaluation_count == max_evaluations) {
+            convergence_.push_back({evaluation_count, best_so_far});
+          }
+
+          if(candidate_make < best_make) {
+            best_make = candidate_make;
+            best_individual = candidate;
+          }
+        }
+
+        if(!isValidPermutation(best_individual, instance.getJobs())) {
+          throw std::runtime_error("Invalid permutation after local search");
+        }
+
+        individual = best_individual;
+        makespan = best_make;
+      
+      
 }

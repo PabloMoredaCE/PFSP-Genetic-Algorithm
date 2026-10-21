@@ -10,7 +10,7 @@ class GeneticAlgorithm {
     
   public:
     GeneticAlgorithm(int population_size, double pc, double pm, 
-      int tournament_size, unsigned int seed);
+      int tournament_size, unsigned int seed, double pls = 0.1);
     
     void run(const Instance& instance, int evaluations);
 
@@ -33,6 +33,7 @@ class GeneticAlgorithm {
     double pm_;
     int tournament_size_;
     std::mt19937 generator_;
+    double pls_;
     
     std::vector<std::pair<int, int>> convergence_;
 
@@ -48,6 +49,10 @@ class GeneticAlgorithm {
 
     void swapMutation(std::vector<int>& individual);
     void insertionMutation(std::vector<int>& individual);
+    
+    void insertionLocalSearch(std::vector<int>& individual, int& makespan,
+          const Instance& instance, int& evaluation_count, int max_evaluations,
+          int& best_so_far, int forced_postion = -1);
 
     bool isValidPermutation(const std::vector<int>& permutation, int jobs) const;
 
