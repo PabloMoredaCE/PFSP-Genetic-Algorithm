@@ -27,6 +27,10 @@ Operadores:
 - Mutación por inserción
 - Reemplazo generacional con elitismo
 
+Modificaciones (en ramas distintas): 
+- Insertion local search
+- Partially Mapped Crossover
+
 ## T5 - Ajuste de parámetros
 ### Configuraciones probadas
 Se probaron los siguientes valores de parámetros:
@@ -38,11 +42,11 @@ Se probaron los siguientes valores de parámetros:
 - Presupuesto de evaluaciones: 50 000
 
 ### Instancia tai20_10_0
-| N | pm | Mean RPD | Best Cmax |
-| 50 | 0.05 | 3.0721 | 1608 |
-| 50 | 0.10 | 2.2377 | 1604 |
-| 100 | 0.05 | 2.3704 | 1593 |
-| 100 | 0.10 | 2.9330 | 1614 |
+| N | pm   | Mean RPD | Best Cmax |
+| 50| 0.05 | 3.0721   | 1608      |
+| 50| 0.10 | 2.2377   | 1604      |
+|100| 0.05 | 2.3704   | 1593      |
+|100| 0.10 | 2.9330   | 1614      |
 Para esta instancia, N = 50 y pm = 0.10 produjeron el RPD medio más bajo. Aunque N = 100 y pm = 0.05 produjeron la mejor solución individual, su rendimiento promedio a lo largo de las 10 ejecuciones independientes fue ligeramente peor.
 
 ### Instancia tai50_5_0
@@ -54,11 +58,11 @@ Otra ronda de pruebas, cambiando los siguientes parámetros:
 - Tamaño del torneo: 3
 - Presupuesto de evaluaciones: 50 000
 
-| pc  | pm | Mean RPD | Std. dev. RPD | Best Cmax |
-| 0.80 | 0.10 | 0.5360 | 0.3235 | 2724 | 2738.6 |
-| 0.45 | 0.10 | 0.5653 | 0.3741 | 2724 | 2739.4 |
-| 0.80 | 0.30 | 0.3157 | 0.2566 | 2724 | 2732.6 |
-| 0.45 | 0.30 | 0.4258 | 0.3167 | 2729 | 2735.6 |
+| pc   | pm   | Mean RPD | Std.dev RPD | BestCmax | Mean Cmax |
+| 0.80 | 0.10 | 0.5360   | 0.3235      | 2724     | 2738.6    |
+| 0.45 | 0.10 | 0.5653   | 0.3741      | 2724     | 2739.4    |
+| 0.80 | 0.30 | 0.3157   | 0.2566      | 2724     | 2732.6    |
+| 0.45 | 0.30 | 0.4258   | 0.3167      | 2729     | 2735.6    |
 
 Para esta instancia, la configuración pc = 0.8 y pm = 0.3 obtuvo el RPD medio más bajo y la menor variabilidad.
 
@@ -71,14 +75,13 @@ En la siguiente ronda de pruebas se cambiaron los siguientes parámetros:
 - Tamaño del torneo: 3, 6, 2
 - Presupuesto de evaluaciones: 50 000
 
- N | Tournament | Mean RPD(UB) | Std. dev. RPD(UB) | Best Cmax | Mean Cmax | Mean CPU (s) |
-|---:|---:|---:|---:|---:|---:|---:|
-| 50  | 2 | 0.7391 | 0.3164 | 5506 | 5533.6 | 0.7513 |
-| 50  | 3 | **0.0965** | **0.1197** | **5493** | **5498.3** | 0.7393 |
-| 50  | 6 | 0.1001 | 0.1848 | **5493** | 5498.5 | **0.7339** |
-| 200 | 2 | 1.5784 | 0.2733 | 5560 | 5579.7 | 0.7849 |
-| 200 | 3 | 0.5462 | 0.1408 | 5505 | 5523.0 | 0.7576 |
-| 200 | 6 | 0.1111 | 0.1513 | **5493** | 5499.1 | 0.7468 |
+ N    | Tournament | Mean RPD(UB) | Std. dev. RPD(UB) | Best Cmax | Mean Cmax | Mean CPU (s) |
+| 50  | 2          | 0.7391       | 0.3164            | 5506      | 5533.6    | 0.7513       |
+| 50  | 3          | **0.0965**   | **0.1197**        | **5493**  | **5498.3**| 0.7393       |
+| 50  | 6          | 0.1001       | 0.1848            | **5493**  | 5498.5    | **0.7339**   |
+| 200 | 2          | 1.5784       | 0.2733            | 5560      | 5579.7    | 0.7849       |
+| 200 | 3          | 0.5462       | 0.1408            | 5505      | 5523.0    | 0.7576       |
+| 200 | 6          | 0.1111       | 0.1513            | **5493**  | 5499.1    | 0.7468       |
 
 La mejor configuración general para esta instancia de ajuste fue N = 50 y tamaño de torneo = 3. Obtuvo el RPD medio más bajo y la menor variabilidad de RPD, alcanzando además la cota superior de referencia Cmax = 5493.
 
@@ -100,10 +103,10 @@ Parámetro cambiado:
 - Tamaño del torneo: 3
 - Presupuesto de evaluaciones: 50 000
 
- pm | Mean RPD | Std. dev. RPD | Best Cmax | Mean Cmax |
-| 0.30 | 0.0965 | 0.1197 | 5493 | 5498.3 |
-| 0.40 | **0.0674** | **0.0838** | **5493** | **5496.7** |
-| 0.50 | 0.1893 | 0.2443 | **5493** | 5503.4 |
+| pm   | Mean RPD | Std. dev. RPD | Best Cmax | Mean Cmax |
+| 0.30 | 0.0965   | 0.1197        | 5493      | 5498.3    |
+| 0.40 |**0.0674**| **0.0838**    | 5493      | **5496.7**|
+| 0.50 | 0.1893   | 0.2443        | 5493      | 5503.4    |
 
 El aumento de la probabilidad de mutación al 40% demostró ofrecer un mejor rendimiento.
 
@@ -154,7 +157,7 @@ Los experimentos de ajuste sugieren que el tamaño del torneo y la probabilidad 
 Entre los parámetros probados, el tamaño del torneo mostró el mayor cambio en el rendimiento.
 
 ### ¿Existe convergencia prematura?
-No he encontrado suficiente evidencia para concluir que exista una convergencia prematura severa. En ambos experimentos de convergencia, el AG continuó mejorando a lo largo del presupuesto de 50 000 evaluaciones.
+No he encontrado suficientes pruebas (pesadas / fuertes) para concluir que exista una convergencia prematura de forma grande. En ambos experimentos de convergencia, el AG continuó mejorando a lo largo del presupuesto de 50 000 evaluaciones.
 
 Para tai100_10_1, el Cmax medio mejor disminuyó de 5958.9 a las 1 000 evaluaciones a 5464.6 a las 50 000. Para tai500_20_0, disminuyó de 29057.7 a 27534.1.
 

@@ -30,6 +30,10 @@ Operators:
 - Insertion mutation
 - Generational replacement with elitism
 
+Modifications (in separate branches): 
+- Insertion local search
+- Partially Mapped Crossover
+
 ## T5 - Parameter tuning
 
 ### Configurations tested
@@ -44,11 +48,11 @@ The following parameter values were tested:
 
 ### Instance tai20_10_0
 
-| N | pm | Mean RPD | Best Cmax |
-| 50 | 0.05 | 3.0721 | 1608 |
-| 50 | 0.10 | 2.2377 | 1604 |
-| 100 | 0.05 | 2.3704 | 1593 |
-| 100 | 0.10 | 2.9330 | 1614 |
+| N | pm   | Mean RPD | Best Cmax |
+| 50| 0.05 | 3.0721   | 1608      |
+| 50| 0.10 | 2.2377   | 1604      |
+|100| 0.05 | 2.3704   | 1593      |
+|100| 0.10 | 2.9330   | 1614      |
 
 For this instance, N = 50 and pm = 0.10 produced the lowest mean RPD. Although N = 100 and pm = 0.05 produced the best
 individual solution, its average performance across the 10
@@ -63,11 +67,11 @@ Another testing round, changing the following parameters:
 - Tournament size: 3
 - Evaluation budget: 50,000
 
-| pc  | pm | Mean RPD | Std. dev. RPD | Best Cmax |
-| 0.80 | 0.10 | 0.5360 | 0.3235 | 2724 | 2738.6 |
-| 0.45 | 0.10 | 0.5653 | 0.3741 | 2724 | 2739.4 |
-| 0.80 | 0.30 | 0.3157 | 0.2566 | 2724 | 2732.6 |
-| 0.45 | 0.30 | 0.4258 | 0.3167 | 2729 | 2735.6 |
+| pc   | pm   | Mean RPD | Std.dev RPD | BestCmax | Mean Cmax |
+| 0.80 | 0.10 | 0.5360   | 0.3235      | 2724     | 2738.6    |
+| 0.45 | 0.10 | 0.5653   | 0.3741      | 2724     | 2739.4    |
+| 0.80 | 0.30 | 0.3157   | 0.2566      | 2724     | 2732.6    |
+| 0.45 | 0.30 | 0.4258   | 0.3167      | 2729     | 2735.6    |
 
 For this instance, the configuration pc = 0.8 and pm = 0.3
 obtained the lowest mean RPD and the lowest variability.
@@ -82,14 +86,13 @@ Next testing round changed the following parameters:
 - Tournament size: 3, 6, 2
 - Evaluation budget: 50,000
 
- N | Tournament | Mean RPD(UB) | Std. dev. RPD(UB) | Best Cmax | Mean Cmax | Mean CPU (s) |
-|---:|---:|---:|---:|---:|---:|---:|
-| 50  | 2 | 0.7391 | 0.3164 | 5506 | 5533.6 | 0.7513 |
-| 50  | 3 | **0.0965** | **0.1197** | **5493** | **5498.3** | 0.7393 |
-| 50  | 6 | 0.1001 | 0.1848 | **5493** | 5498.5 | **0.7339** |
-| 200 | 2 | 1.5784 | 0.2733 | 5560 | 5579.7 | 0.7849 |
-| 200 | 3 | 0.5462 | 0.1408 | 5505 | 5523.0 | 0.7576 |
-| 200 | 6 | 0.1111 | 0.1513 | **5493** | 5499.1 | 0.7468 |
+ N    | Tournament | Mean RPD(UB) | Std. dev. RPD(UB) | Best Cmax | Mean Cmax | Mean CPU (s) |
+| 50  | 2          | 0.7391       | 0.3164            | 5506      | 5533.6    | 0.7513       |
+| 50  | 3          | **0.0965**   | **0.1197**        | **5493**  | **5498.3**| 0.7393       |
+| 50  | 6          | 0.1001       | 0.1848            | **5493**  | 5498.5    | **0.7339**   |
+| 200 | 2          | 1.5784       | 0.2733            | 5560      | 5579.7    | 0.7849       |
+| 200 | 3          | 0.5462       | 0.1408            | 5505      | 5523.0    | 0.7576       |
+| 200 | 6          | 0.1111       | 0.1513            | **5493**  | 5499.1    | 0.7468       |
 
 The best overall configuration for this tuning instance was
 N = 50 and tournament size = 3. It obtained the lowest mean
@@ -119,10 +122,10 @@ Parameter changed:
 - Crossover probability: pc = 0.8
 - Tournament size: 3
 - Evaluation budget: 50,000
- pm | Mean RPD | Std. dev. RPD | Best Cmax | Mean Cmax |
-| 0.30 | 0.0965 | 0.1197 | 5493 | 5498.3 |
-| 0.40 | **0.0674** | **0.0838** | **5493** | **5496.7** |
-| 0.50 | 0.1893 | 0.2443 | **5493** | 5503.4 |
+| pm   | Mean RPD | Std. dev. RPD | Best Cmax | Mean Cmax |
+| 0.30 | 0.0965   | 0.1197        | 5493      | 5498.3    |
+| 0.40 |**0.0674**| **0.0838**    | 5493      | **5496.7**|
+| 0.50 | 0.1893   | 0.2443        | 5493      | 5503.4    |
 
 The mutation probability rising to 40% proved to be have better performance
 
@@ -176,7 +179,7 @@ Among the tested parameters, tournament size showed the largest performance chan
 
 ### Is there premature convergence?
 
-I have not found enough evidence to conclude that there is severe premature convergence. In both convergence experiments, the GA continued improving throughout the 50,000-evaluation budget.
+I have not found enough (strong) evidence to conclude that there is severe premature convergence. In both convergence experiments, the GA continued improving throughout the 50,000-evaluation budget.
 
 For tai100_10_1, the mean best Cmax decreased from 5958.9 at 1,000 evaluations to 5464.6 at 50,000. For tai500_20_0, it decreased from 29057.7 to 27534.1.
 
