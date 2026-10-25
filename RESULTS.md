@@ -1,5 +1,11 @@
 # Experimental Results
 
+This document records the methodology, parameter tuning, and final evaluation of a C++17 genetic algorithm for the Permutation Flow Shop Scheduling Problem. For build and usage instructions, see [README.md](README.md).
+
+The final evaluation uses 117 Taillard instances after excluding the three tuning instances (`tai20_10_0.fsp`, `tai50_5_0.fsp`, and `tai100_5_0.fsp`). The archived results contain 1,170 GA runs, 1,170 Random Search runs, and 117 NEH executions.
+
+RPD is calculated relative to the reference upper bound: `100 × (Cmax − UB) / UB`. Lower values are better.
+
 ## T1 - Makespan validation
 
 Example instance:
@@ -17,11 +23,11 @@ Implemented:
 
 ## T3 - Genetic Algorithm
 
-Configuration currently under study:
+Final main-branch configuration after T5 tuning:
 - pc = 0.8
 - tournament size = 3
 - N = 50
-- pm = 0.1
+- pm = 0.4
 
 Operators:
 - Tournament selection
@@ -86,7 +92,8 @@ Next testing round changed the following parameters:
 - Tournament size: 3, 6, 2
 - Evaluation budget: 50,000
 
- N    | Tournament | Mean RPD(UB) | Std. dev. RPD(UB) | Best Cmax | Mean Cmax | Mean CPU (s) |
+| N    | Tournament | Mean RPD(UB) | Std. dev. RPD(UB) | Best Cmax | Mean Cmax | Mean CPU (s) |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | 50  | 2          | 0.7391       | 0.3164            | 5506      | 5533.6    | 0.7513       |
 | 50  | 3          | **0.0965**   | **0.1197**        | **5493**  | **5498.3**| 0.7393       |
 | 50  | 6          | 0.1001       | 0.1848            | **5493**  | 5498.5    | **0.7339**   |
@@ -123,18 +130,19 @@ Parameter changed:
 - Tournament size: 3
 - Evaluation budget: 50,000
 | pm   | Mean RPD | Std. dev. RPD | Best Cmax | Mean Cmax |
+| ---: | ---: | ---: | ---: | ---: |
 | 0.30 | 0.0965   | 0.1197        | 5493      | 5498.3    |
 | 0.40 |**0.0674**| **0.0838**    | 5493      | **5496.7**|
 | 0.50 | 0.1893   | 0.2443        | 5493      | 5503.4    |
 
-The mutation probability rising to 40% proved to be have better performance
+In this experiment, a mutation probability of 40% produced the lowest mean RPD and variability among the values tested.
 
 ### Final configuration
 
 - Population size: N = 50
-- Crossover probabilitry: pc = 0.80
+- Crossover probability: pc = 0.80
 - Mutation probability: pm = 0.40
-- Tournament sizd : 3
+- Tournament size: 3
 - Evaluation budget: 50,000
 
 ### Justification
@@ -150,19 +158,21 @@ The choice was based on the tuning experiments:
 With the chosen values for the parameters, 117 instances were evaluated, excluding the three instances used during T5 (tai20_10_0, tai50_5_0 and tai100_5_0)
 It's also important to mention that NEH is deterministic, so a single execution per instance was stored because repeated executions would produce the same result. 
 The mean RPD obtained for each instance group was:
-n	  m	  GA   RandomSearch  NEH
-20	5	  0.8836	5.7172	3.0823
-20	10	2.2823	9.3038	4.7974
-20	20	1.9710	7.7813	3.6634
-50	5	  0.5950	4.7648	0.5276
-50	10	3.3485	13.1159	5.0755
-50	20	4.6131	15.7745	5.8483
-100	5	  0.5537	3.8780	0.3238
-100	10	2.1665	10.1060	2.3860
-100	20	4.8506	15.1784	4.7119
-200	10	1.9458	8.2999	1.2771
-200	20	5.0648	14.2670	3.1637
-500	20	4.5563	11.0815	1.8762
+
+| Jobs | Machines | GA | Random Search | NEH |
+| ---: | ---: | ---: | ---: | ---: |
+| 20 | 5 | 0.8836 | 5.7172 | 3.0823 |
+| 20 | 10 | 2.2823 | 9.3038 | 4.7974 |
+| 20 | 20 | 1.9710 | 7.7813 | 3.6634 |
+| 50 | 5 | 0.5950 | 4.7648 | 0.5276 |
+| 50 | 10 | 3.3485 | 13.1159 | 5.0755 |
+| 50 | 20 | 4.6131 | 15.7745 | 5.8483 |
+| 100 | 5 | 0.5537 | 3.8780 | 0.3238 |
+| 100 | 10 | 2.1665 | 10.1060 | 2.3860 |
+| 100 | 20 | 4.8506 | 15.1784 | 4.7119 |
+| 200 | 10 | 1.9458 | 8.2999 | 1.2771 |
+| 200 | 20 | 5.0648 | 14.2670 | 3.1637 |
+| 500 | 20 | 4.5563 | 11.0815 | 1.8762 |
 
 Across the complete evaluation set, the average RPD was approximately 2.78% for the GA, 3.09% for NEH, and 10.04% for Random Search. Therefore, the GA substantially improves on Random Search and obtains a slightly better overall result than NEH, although NEH remains better on several of the larger instance groups.
 Convergence was also studied on tai100_10_1 and tai500_20_0. The best-so-far makespan was recorded every 1,000 evaluations and averaged across the 10 runs.
